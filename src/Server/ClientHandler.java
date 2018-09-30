@@ -44,9 +44,28 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+    	
+    	//This code should run only once, sets userName to something the client sends and then moves on. 
+    	String userName ="";
+		try {
+			userName = (String) in.readObject();
+	    	String welcomeMess = "Welcome" + userName + "to stop chat enter '/close' as message";
+	    	out.writeChars(welcomeMess);
+		} catch (ClassNotFoundException | IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+    	
         while(socket.isConnected()) {
             try {
-                Message message = (Message) in.readObject();
+            	
+            	//Parse new message string from user
+            	String userMessage = (String) in.readObject();
+            	
+            	Message message = new Message(userName, userMessage);
+            	
+                //Message message = (Message) in.readObject();
                 messages.add(message);
 
             } catch (IOException e) {
