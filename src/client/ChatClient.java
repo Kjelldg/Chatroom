@@ -3,10 +3,14 @@ package client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
+
+import Server.Interfaces.Message;
 
 public class ChatClient {
 	
@@ -14,14 +18,16 @@ public class ChatClient {
 	private static String userName;
 	private static Scanner userInput;
 	
-	private static PrintWriter out;
-	private static BufferedReader in;
+	//private static PrintWriter out;
+	//private static BufferedReader in;
+	private static ObjectOutputStream out;
+	private static ObjectInputStream in;
 	
 	/*
 	 * Commented out so that server can run from main()
 	 */
 	
-	/*
+	
 	public static void main(String[] args) {
 		System.out.println("Welcome to chat.\n Would you like to connect now? (yes/no)");
 		userInput = new Scanner(System.in);
@@ -34,14 +40,16 @@ public class ChatClient {
 				System.out.println("connected to: " + socket.getInetAddress());
 				
 				try {
-					out = new PrintWriter(socket.getOutputStream());
-					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					//out = new PrintWriter(socket.getOutputStream());
+					out = new ObjectOutputStream(socket.getOutputStream());
+					in = new ObjectInputStream(socket.getInputStream());
+					//in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				
 				//send username to server
-				out.print(userName);
+				//out.print(userName);
 				//return message from server prompting username: like: welcome userName write "/close" to close connection
 				try {
 					String greeting = in.readLine();
@@ -53,19 +61,27 @@ public class ChatClient {
 				//loop until user is typing /close 
 				while(!message.equalsIgnoreCase("/close")) {
 					//send message
-					out.print(message);
-					out.flush();
+					Message mess = new Message(userName, message);
+					//out.print(message);
+					//out.flush();
+					try {
+						out.writeObject(mess);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block						e1.printStackTrace();
+					}
 					
 					//retrieve messages - NOT SURE IF THIS WORKS
-					String serverMessage = "";
+					//String serverMessage = "";
+					Message serverMessage = new Message();
 					try {
-						serverMessage = in.readLine();
-					} catch (IOException e) {
+						serverMessage = (Message) in.readObject();
+						//serverMessage = in.readLine();
+					} catch (IOException | ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					if(serverMessage != null) {
-						System.out.println(serverMessage);
+						System.out.println(serverMessage.getUserName()+": " +  serverMessage.getMessage());
 						//save to file logic goes here..
 					}
 				}
@@ -77,7 +93,7 @@ public class ChatClient {
 			System.out.println("Goodbye");
 		}
 		
-	}*/
+	}
 	
 	private static boolean connectedToServer() {
 		

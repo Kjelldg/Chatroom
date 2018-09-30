@@ -5,6 +5,11 @@ public class Message {
 	private String userName;
 	private String message;
 	
+	
+	
+	public Message() {
+	}
+
 	public Message(String userName, String message) {
 				
 		if(userName.equals("")) {
@@ -17,6 +22,16 @@ public class Message {
 			this.message = message;
 		}
 	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+	
+	
 	
 	
 }
