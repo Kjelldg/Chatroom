@@ -1,17 +1,17 @@
 package Server;
-
-import Server.Interfaces.Message;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
+import Server.Interfaces.Message;
+
 public class Server {
     private ServerSocket serverSocket;
-    private boolean running = true;
     private ArrayList<ClientHandler> clients = new ArrayList<>(); // TODO - implement client.
     // TODO - add a message queue.
 
+
+    // Start server and listens for the specified port.
     public Server(int port) {
         try {
             serverSocket = new ServerSocket(port);
@@ -22,11 +22,18 @@ public class Server {
         }
     }
 
+
     public void listen() {
         // TODO - fix when client is implemented
         try {
+
+            // Listens for connections
             ClientHandler client = new ClientHandler(serverSocket.accept(), messages);
+
+            // Start a client thread.
             client.start(); // TODO implement client.
+
+            // Adds the cllient to connected clients.
             clients.add(client);
 
         } catch(IOException e) {

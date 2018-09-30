@@ -1,6 +1,6 @@
 package Server;
 
-import Server.Interfaces.Message;
+import Resources.Message;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,21 +14,24 @@ public class ClientHandler implements Runnable {
     ObjectInputStream in;
     ObjectOutputStream out;
 
-
+    // In charge of creating a thread for the client and handling packets from the client.
     public ClientHandler(Socket socket, ArrayList<Message> messages) {
         this.socket = socket;
         System.out.println("Client connected.");
         this.messages = messages;
 
         try {
+            // Establishes streams to and from the client.
             this.in = new ObjectInputStream(socket.getInputStream());
             this.out = new ObjectOutputStream(socket.getOutputStream());
 
         } catch(IOException e) {
             System.err.println(String.format("Could not open streams for %s", socket.getRemoteSocketAddress()));
+            close();
         }
     }
 
+    // Closes streams and socket when error occurs.
     void close() {
         try {
             socket.close();
@@ -39,8 +42,6 @@ public class ClientHandler implements Runnable {
             close();
         }
     }
-
-
 
     @Override
     public void run() {
