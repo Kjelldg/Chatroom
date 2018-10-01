@@ -1,6 +1,6 @@
 package Server;
 
-import Server.Interfaces.Message;
+import Resources.Packet;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,27 +8,30 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ClientHandler implements Runnable {
+public class ClientHandler extends Thread {
     Socket socket;
-    ArrayList<Message> messages;
+    ArrayList<Packet> messages;
     ObjectInputStream in;
     ObjectOutputStream out;
 
-
-    public ClientHandler(Socket socket, ArrayList<Message> messages) {
+    // In charge of creating a thread for the client and handling packets from the client.
+    public ClientHandler(Socket socket, ArrayList<Packet> messages) {
         this.socket = socket;
         System.out.println("Client connected.");
         this.messages = messages;
 
         try {
+            // Establishes streams to and from the client.
             this.in = new ObjectInputStream(socket.getInputStream());
             this.out = new ObjectOutputStream(socket.getOutputStream());
 
         } catch(IOException e) {
             System.err.println(String.format("Could not open streams for %s", socket.getRemoteSocketAddress()));
+            close();
         }
     }
 
+    // Closes streams and socket when error occurs.
     void close() {
         try {
             socket.close();
@@ -39,8 +42,6 @@ public class ClientHandler implements Runnable {
             close();
         }
     }
-
-
 
     @Override
     public void run() {
@@ -63,9 +64,9 @@ public class ClientHandler implements Runnable {
             	//Parse new message string from user
             	String userMessage = (String) in.readObject();
             	
-            	Message message = new Message(userName, userMessage);
+            	Packet message = new Packet(userName, userMessage);
             	
-                //Message message = (Message) in.readObject();
+                //Packet message = (Packet) in.readObject();
                 messages.add(message);
 
             } catch (IOException e) {

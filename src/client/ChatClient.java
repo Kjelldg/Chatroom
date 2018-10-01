@@ -27,7 +27,11 @@ public class ChatClient {
 	 * Commented out so that server can run from main()
 	 */
 	
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> 3ab3547ef13895cdfa8a3e2cfdbcd323884cbbf7
 	public static void main(String[] args) {
 		System.out.println("Welcome to chat.\n Would you like to connect now? (yes/no)");
 		userInput = new Scanner(System.in);
@@ -98,8 +102,8 @@ public class ChatClient {
 	private static boolean connectedToServer() {
 		
 		try {
-			InetAddress adress = InetAddress.getByName("www.fabfourstudios.com");
-			socket = new Socket(adress, 10000);
+			InetAddress adress = InetAddress.getByName("localhost");
+			socket = new Socket(adress, 8080);
 			return true;
 		}
 		catch (Exception e) {

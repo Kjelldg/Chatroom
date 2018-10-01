@@ -1,6 +1,5 @@
 package Server;
-
-import Server.Interfaces.Message;
+import Resources.Packet;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,10 +7,12 @@ import java.util.ArrayList;
 
 public class Server {
     private ServerSocket serverSocket;
-    private boolean running = true;
     private ArrayList<ClientHandler> clients = new ArrayList<>(); // TODO - implement client.
+    private ArrayList<Packet> messages = new ArrayList<>();
     // TODO - add a message queue.
 
+
+    // Start server and listens for the specified port.
     public Server(int port) {
         try {
             serverSocket = new ServerSocket(port);
@@ -22,11 +23,17 @@ public class Server {
         }
     }
 
+
     public void listen() {
-        // TODO - fix when client is implemented
         try {
+
+            // Listens for connections
             ClientHandler client = new ClientHandler(serverSocket.accept(), messages);
-            client.start(); // TODO implement client.
+
+            // Start a client thread.
+            client.start();
+
+            // Adds the cllient to connected clients.
             clients.add(client);
 
         } catch(IOException e) {
@@ -35,9 +42,9 @@ public class Server {
     }
 
 
-    /*public static void main(String args[]) throws Exception {
+    public static void main(String args[])  {
         Server server = new Server(8080);
         server.listen();
 
-    }*/
+    }
 }
