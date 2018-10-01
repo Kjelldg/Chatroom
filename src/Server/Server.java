@@ -1,13 +1,14 @@
 package Server;
+import Resources.Packet;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
-import Server.Interfaces.Message;
-
 public class Server {
     private ServerSocket serverSocket;
     private ArrayList<ClientHandler> clients = new ArrayList<>(); // TODO - implement client.
+    private ArrayList<Packet> messages = new ArrayList<>();
     // TODO - add a message queue.
 
 
@@ -24,14 +25,13 @@ public class Server {
 
 
     public void listen() {
-        // TODO - fix when client is implemented
         try {
 
             // Listens for connections
             ClientHandler client = new ClientHandler(serverSocket.accept(), messages);
 
             // Start a client thread.
-            client.start(); // TODO implement client.
+            client.start();
 
             // Adds the cllient to connected clients.
             clients.add(client);
@@ -42,9 +42,9 @@ public class Server {
     }
 
 
-    /*public static void main(String args[]) throws Exception {
+    public static void main(String args[])  {
         Server server = new Server(8080);
         server.listen();
 
-    }*/
+    }
 }

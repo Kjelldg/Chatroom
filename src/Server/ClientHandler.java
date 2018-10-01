@@ -1,6 +1,6 @@
 package Server;
 
-import Resources.Message;
+import Resources.Packet;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,14 +8,14 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ClientHandler implements Runnable {
+public class ClientHandler extends Thread {
     Socket socket;
-    ArrayList<Message> messages;
+    ArrayList<Packet> messages;
     ObjectInputStream in;
     ObjectOutputStream out;
 
     // In charge of creating a thread for the client and handling packets from the client.
-    public ClientHandler(Socket socket, ArrayList<Message> messages) {
+    public ClientHandler(Socket socket, ArrayList<Packet> messages) {
         this.socket = socket;
         System.out.println("Client connected.");
         this.messages = messages;
@@ -64,9 +64,9 @@ public class ClientHandler implements Runnable {
             	//Parse new message string from user
             	String userMessage = (String) in.readObject();
             	
-            	Message message = new Message(userName, userMessage);
+            	Packet message = new Packet(userName, userMessage);
             	
-                //Message message = (Message) in.readObject();
+                //Packet message = (Packet) in.readObject();
                 messages.add(message);
 
             } catch (IOException e) {
