@@ -10,7 +10,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
-import Server.Interfaces.Message;
+import Resources.Packet;
 
 public class ChatClient {
 	
@@ -27,11 +27,6 @@ public class ChatClient {
 	 * Commented out so that server can run from main()
 	 */
 	
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 3ab3547ef13895cdfa8a3e2cfdbcd323884cbbf7
 	public static void main(String[] args) {
 		System.out.println("Welcome to chat.\n Would you like to connect now? (yes/no)");
 		userInput = new Scanner(System.in);
@@ -52,46 +47,57 @@ public class ChatClient {
 					e.printStackTrace();
 				}
 				
-				//send username to server
-				//out.print(userName);
-				//return message from server prompting username: like: welcome userName write "/close" to close connection
 				try {
-					String greeting = in.readLine();
-				} catch (IOException e) {
+					//send username to server
+					out.writeObject(new Packet(Packet.PASSWORD, userName, ""));
+					//return message from server prompting username: like: welcome userName write "/close" to close connection
+					Packet greet = (Packet)in.readObject();
+					System.out.println(greet.getData());
+				} catch (IOException | ClassNotFoundException e) {
 					e.printStackTrace();
 				}
 				
-				String message = userInput.nextLine();
+				boolean connectionClosed = false;
 				//loop until user is typing /close 
-				while(!message.equalsIgnoreCase("/close")) {
+				while(!connectionClosed) {
+					
+					System.out.println("Enter new message");
+					//read user input
+					String message = userInput.nextLine();
+					//break loop if user prompts command. 
+					if(message.equalsIgnoreCase("/close")) {
+						connectionClosed = true;
+						break;
+					}
 					//send message
-					Message mess = new Message(userName, message);
+					Packet pack = new Packet(Packet.TEXT, userName, message);
 					//out.print(message);
 					//out.flush();
 					try {
-						out.writeObject(mess);
+						out.writeObject(pack);
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block						e1.printStackTrace();
+						e1.printStackTrace();
 					}
 					
-					//retrieve messages - NOT SURE IF THIS WORKS
-					//String serverMessage = "";
-					Message serverMessage = new Message();
+					//retrieve message
+					Packet serverMessage = new Packet(Packet.TEXT,"","");
 					try {
-						serverMessage = (Message) in.readObject();
+						serverMessage = (Packet) in.readObject();
 						//serverMessage = in.readLine();
 					} catch (IOException | ClassNotFoundException e) {
-						// TODO Auto-generated catch block
+						
 						e.printStackTrace();
 					}
-					if(serverMessage != null) {
-						System.out.println(serverMessage.getUserName()+": " +  serverMessage.getMessage());
-						//save to file logic goes here..
+					if(serverMessage != null && serverMessage.getFlag() == Packet.TEXT) {
+						
+						System.out.println(serverMessage.getUsername()+": " +  serverMessage.getData()+"\n");
+						//TODO: save to file logic goes here..
 					}
 				}
 				
-
+				closeConnection();
 			}
+
 		}
 		else {
 			System.out.println("Goodbye");
@@ -103,12 +109,20 @@ public class ChatClient {
 		
 		try {
 			InetAddress adress = InetAddress.getByName("localhost");
-			socket = new Socket(adress, 8080);
+			socket = new Socket(adress, 1337);
 			return true;
 		}
 		catch (Exception e) {
 			System.out.println("failed to connect");
 			return false;
+		}
+	}
+	
+	private static void closeConnection() {
+		try {
+			socket.close();
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	

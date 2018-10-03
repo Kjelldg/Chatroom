@@ -42,8 +42,8 @@ public class Server {
     }
 
 
-    public static void main(String args[])  {
-        Server server = new Server(8080);
+   public static void main(String args[])  {
+        Server server = new Server(1337);
         server.listen();
 
     }

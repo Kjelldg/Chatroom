@@ -46,14 +46,20 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
     	
-    	//This code should run only once, sets userName to something the client sends and then moves on. 
-    	String userName ="";
+    	//This code should run only once, registers user to db(?) and sends welcome confirmation back to the client 
+    	String userName = "";
 		try {
-			userName = (String) in.readObject();
-	    	String welcomeMess = "Welcome" + userName + "to stop chat enter '/close' as message";
-	    	out.writeChars(welcomeMess);
+			
+			Packet user = (Packet) in.readObject();
+			//TODO: logic to save user to db goes here
+			
+			//used later to set userName to packet obj
+			userName = user.getUsername();
+	    	String welcomeMess = "Welcome" + user.getUsername() + " to stop chat enter '/close' as message";
+	    	out.writeObject(new Packet(Packet.TEXT, user.getUsername(), welcomeMess));
+	    	
 		} catch (ClassNotFoundException | IOException e1) {
-			// TODO Auto-generated catch block
+			
 			e1.printStackTrace();
 		}
 
@@ -61,13 +67,19 @@ public class ClientHandler extends Thread {
         while(socket.isConnected()) {
             try {
             	
-            	//Parse new message string from user
-            	String userMessage = (String) in.readObject();
+            	//get new chat message from user
+            	Packet userMessage = (Packet) in.readObject();
             	
-            	Packet message = new Packet(userName, userMessage);
-            	
-                //Packet message = (Packet) in.readObject();
-                messages.add(message);
+            	if(userMessage.getFlag()==Packet.TEXT) {
+            		// store message
+            		messages.add(userMessage);
+            		//echo message
+            		out.writeObject(userMessage);
+            	}
+            	else {
+            		//TODO: Store user data in db?
+            	}
+                
 
             } catch (IOException e) {
                 System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
