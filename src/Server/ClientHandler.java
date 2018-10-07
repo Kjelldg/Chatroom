@@ -6,24 +6,26 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 
-public class ClientHandler extends Thread {
-    Socket socket;
-    ArrayList<Packet> messages;
-    ObjectInputStream in;
-    ObjectOutputStream out;
+
+class ClientHandler extends Thread {
+    private Socket socket;
+    private ObjectInputStream in;
+    public ObjectOutputStream out;
+    private String username;
+    private boolean loggedIn = false;
+
 
     // In charge of creating a thread for the client and handling packets from the client.
-    public ClientHandler(Socket socket, ArrayList<Packet> messages) {
+    public ClientHandler(Socket socket) {
+        //System.out.println("Client connected.");
         this.socket = socket;
-        System.out.println("Client connected.");
-        this.messages = messages;
 
         try {
             // Establishes streams to and from the client.
             this.in = new ObjectInputStream(socket.getInputStream());
             this.out = new ObjectOutputStream(socket.getOutputStream());
+
 
         } catch(IOException e) {
             System.err.println(String.format("Could not open streams for %s", socket.getRemoteSocketAddress()));
@@ -32,7 +34,7 @@ public class ClientHandler extends Thread {
     }
 
     // Closes streams and socket when error occurs.
-    void close() {
+    private void close() {
         try {
             socket.close();
             in.close();
@@ -43,50 +45,73 @@ public class ClientHandler extends Thread {
         }
     }
 
-    @Override
-    public void run() {
-    	
-    	//This code should run only once, registers user to db(?) and sends welcome confirmation back to the client 
-    	String userName = "";
-		try {
-			
-			Packet user = (Packet) in.readObject();
-			//TODO: logic to save user to db goes here
-			
-			//used later to set userName to packet obj
-			userName = user.getUsername();
-	    	String welcomeMess = "Welcome" + user.getUsername() + " to stop chat enter '/close' as message";
-	    	out.writeObject(new Packet(Packet.TEXT, user.getUsername(), welcomeMess));
-	    	
-		} catch (ClassNotFoundException | IOException e1) {
-			
-			e1.printStackTrace();
-		}
+    private void login(Packet initPacket) {
 
-    	
-        while(socket.isConnected()) {
+        // reads the initial packet from client
+        String username = initPacket.getUsername();
+        String password = initPacket.getData();
+
+        // logs in the client if the user exist
+        if (initPacket.getFlag() == Packet.PASSWORD && Server.database.userExistence(username)) {
+            loggedIn = Server.database.logOnUser(username, password);
+            this.username = username;
+        }
+
+        // register the client
+        if (initPacket.getFlag() == Packet.REGISTER && !Server.database.userExistence(username)) {
+            Server.database.createUser(username, password);
+            System.out.println(String.format("User %s has been created.", username));
+        }
+    }
+
+
+        @Override
+        public void run() {
+
+            //This code should run only once, registers user to db(?) and sends welcome confirmation back to the client
             try {
-            	
-            	//get new chat message from user
-            	Packet userMessage = (Packet) in.readObject();
-            	
-            	if(userMessage.getFlag()==Packet.TEXT) {
-            		// store message
-            		messages.add(userMessage);
-            		//echo message
-            		out.writeObject(userMessage);
-            	}
-            	else {
-            		//TODO: Store user data in db?
-            	}
-                
+
+                Packet initialPacket = (Packet) in.readObject();
+                //TODO: logic to save user to db goes here
+                login(initialPacket);
+                //used later to set userName to packet obj
+                String welcomeMess = "Welcome" + username + " to stop chat enter '/close' as message";
+                out.writeObject(new Packet(Packet.TEXT, username, welcomeMess));
 
             } catch (IOException e) {
                 System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
             } catch (ClassNotFoundException e) {
                 System.err.println(String.format("Wrong object received from %s", socket.getRemoteSocketAddress()));
             }
-        }
-    }
 
-}
+
+            while (socket.isConnected() && loggedIn) {
+                try {
+
+                    //get new chat message from user
+                    Packet userMessage = (Packet) in.readObject();
+
+                    if (userMessage.getFlag() == Packet.TEXT) {
+                        // store message
+                        Server.messageQueue.push(userMessage);
+
+                    } else {
+                        System.err.println("Wrong packet flag sent from client.");
+                    }
+
+                    //Parse new message string from user
+                    //String userMessage = (String) in.readObject();
+                    //Packet message = new Packet(Packet.TEXT, userName, userMessage);
+
+                    //Packet message = (Packet) in.readObject();
+                    //messages.add(message);
+
+                } catch (IOException e) {
+                    System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
+                } catch (ClassNotFoundException e) {
+                    System.err.println(String.format("Wrong object received from %s", socket.getRemoteSocketAddress()));
+                }
+            }
+        }
+
+    }
