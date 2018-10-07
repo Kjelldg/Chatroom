@@ -7,6 +7,7 @@ public class Packet implements Serializable {
     private String data;
     public final static int PASSWORD = 1;
     public final static int TEXT = 2;
+    public final static int REGISTER = 3;
 
     // used for determine if the data is for a password or a message.
     private int flag;
@@ -19,7 +20,11 @@ public class Packet implements Serializable {
     Example 2 - Sending a text to the chat when the user is logged in.
     Packet message = new Packet(Packet.TEXT, "TestUser", "Hello everyone!");
     clientOutputStream.writeObject(login);
-     */
+
+    Example 3 - Sending registration request to the server.
+    Packet register = new Packet(Packet.REGISTER, "TestUser", "Hunter2");
+    clientOutputStream.writeObject(login);
+    */
 
 
     // use to send messages to the server
