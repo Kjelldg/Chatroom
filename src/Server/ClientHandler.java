@@ -55,12 +55,14 @@ class ClientHandler extends Thread {
         if (initPacket.getFlag() == Packet.PASSWORD && Server.database.userExistence(username)) {
             loggedIn = Server.database.logOnUser(username, password);
             this.username = username;
+	    out.writeObject(new Packet(Packet.TEXT, "Server", "Logged in"))
         }
 
         // register the client
         if (initPacket.getFlag() == Packet.REGISTER && !Server.database.userExistence(username)) {
             Server.database.createUser(username, password);
             System.out.println(String.format("User %s has been created.", username));
+	    out.writeObject(new Packet(Packet.TEXT, "Server", "Registered"))
         }
     }
 
