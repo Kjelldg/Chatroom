@@ -24,7 +24,6 @@ public class ServerThread extends Thread {
         while(true) {
             if(!Server.clients.isEmpty()) {
                 Packet currentPacket = Server.messageQueue.pop();
-
                 for (ClientHandler client : Server.clients) {
                     send(client, currentPacket);
                 }

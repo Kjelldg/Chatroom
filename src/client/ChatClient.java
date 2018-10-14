@@ -74,19 +74,16 @@ public class ChatClient {
 					}
 					// send message
 					Packet pack = new Packet(Packet.TEXT, userName, message);
-					// out.print(message);
-					// out.flush();
 					try {
 						out.writeObject(pack);
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
 
-					// retrieve message
+					// retrieve new message
 					Packet serverMessage = new Packet(Packet.TEXT, "", "");
 					try {
 						serverMessage = (Packet) in.readObject();
-						// serverMessage = in.readLine();
 					} catch (IOException | ClassNotFoundException e) {
 
 						e.printStackTrace();

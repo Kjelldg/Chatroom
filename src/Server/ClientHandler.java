@@ -115,7 +115,7 @@ class ClientHandler extends Thread {
 				} else {
 					System.err.println("Wrong packet flag sent from client.");
 				}
-
+				
 				// Parse new message string from user
 				// String userMessage = (String) in.readObject();
 				// Packet message = new Packet(Packet.TEXT, userName, userMessage);

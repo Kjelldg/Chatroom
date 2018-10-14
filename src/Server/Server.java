@@ -7,14 +7,13 @@ import sun.misc.resources.Messages;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Server {
     private ServerSocket serverSocket;
     public static ArrayList<ClientHandler> clients = new ArrayList<>();
-    public static Database database = new Database("jdbc:postgresql://localhost:5432/postgres",
-                                  "postgres",
-                                  "[3`Td?9=");
+    public static Database database;
 
     public static MessageQueue messageQueue = new MessageQueue();
 
@@ -24,6 +23,9 @@ public class Server {
     public Server(int port) {
         try {
             // initialize the database
+        	database = new Database("jdbc:postgresql://localhost:5432/postgres",
+                    "postgres",
+                    "[3`Td?9=");
             database.setUp();
 
             serverSocket = new ServerSocket(port);
@@ -35,7 +37,10 @@ public class Server {
 
         } catch(IOException e) {
             System.err.println(String.format("Port %s is already open.", port));
-        }
+        } catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 
@@ -63,7 +68,10 @@ public class Server {
 
    public static void main(String args[])  {
         Server server = new Server(1337);
+        
         server.listen();
+        
+        
 
     }
 }

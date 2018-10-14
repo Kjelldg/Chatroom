@@ -18,10 +18,12 @@ public class Database {
 	private String databasePassword;
 
 	// Constructor.
-	public Database(String url, String databaseUsername, String databasePassword) {
+	public Database(String url, String databaseUsername, String databasePassword) throws SQLException {
 		this.url = url;
 		this.databaseUsername = databaseUsername;
 		this.databasePassword = databasePassword;
+		
+		connectDatabase();
 	}
 
 	public Database() {
