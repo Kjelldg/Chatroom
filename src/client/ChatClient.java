@@ -17,6 +17,7 @@ public class ChatClient {
 
 	private static Socket socket;
 	private static String userName;
+	private static String password;
 	private static Scanner userInput;
 
 	// private static PrintWriter out;
@@ -49,8 +50,8 @@ public class ChatClient {
 				}
 
 				try {
-					// send username to server
-					out.writeObject(new Packet(Packet.PASSWORD, userName, ""));
+					// send username and password to server
+					out.writeObject(new Packet(Packet.PASSWORD, userName, password));
 					// return message from server prompting username: like: welcome userName write
 					// "/close" to close connection
 					Packet greet = (Packet) in.readObject();
@@ -132,9 +133,11 @@ public class ChatClient {
 		while (!valid) {
 			System.out.println("Please enter an awesome online handle: ");
 			String tempUserName = userInput.nextLine();
-			System.out.println("Do you want " + tempUserName + " as you online handle?");
+			System.out.println("Do you want " + tempUserName + " as you online handle? (yes/no)");
 			if (userInput.nextLine().equalsIgnoreCase("yes")) {
 				userName = tempUserName;
+				System.out.println("Please enter a password: ");
+				password = userInput.nextLine();
 				valid = true;
 			}
 		}

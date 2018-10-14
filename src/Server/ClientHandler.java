@@ -53,16 +53,25 @@ class ClientHandler extends Thread {
 		// logs in the client if the user exist
 		if (initPacket.getFlag() == Packet.PASSWORD && Server.database.userExistence(username)) {
 			loggedIn = Server.database.logOnUser(username, password);
-			this.username = username;
-			try {
-				out.writeObject(new Packet(Packet.TEXT, "Server", "Logged in"));
-			} catch (IOException e) {
-				e.printStackTrace();
+			
+			if(loggedIn) {
+				this.username = username;
+				try {
+					out.writeObject(new Packet(Packet.TEXT, "Server", "Logged in"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			else {
+				try {
+					out.writeObject(new Packet(Packet.TEXT, "Server", "Wrong user credentials, could not log in"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-
-		// register the client
-		if (initPacket.getFlag() == Packet.REGISTER && !Server.database.userExistence(username)) {
+		//if Client has sent a Password packet and user doesn't exist, create one!
+		else if (initPacket.getFlag() == Packet.PASSWORD && !Server.database.userExistence(username)) {
 			Server.database.createUser(username, password);
 			System.out.println(String.format("User %s has been created.", username));
 			try {
@@ -84,8 +93,8 @@ class ClientHandler extends Thread {
 			// TODO: logic to save user to db goes here
 			login(initialPacket);
 			// used later to set userName to packet obj
-			String welcomeMess = "Welcome" + username + " to stop chat enter '/close' as message";
-			out.writeObject(new Packet(Packet.TEXT, username, welcomeMess));
+			//String welcomeMess = "Welcome" + username + " to stop chat enter '/close' as message";
+			//out.writeObject(new Packet(Packet.TEXT, username, welcomeMess));
 
 		} catch (IOException e) {
 			System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
