@@ -25,7 +25,9 @@ public class Packet implements Serializable {
     Packet register = new Packet(Packet.REGISTER, "TestUser", "Hunter2");
     clientOutputStream.writeObject(login);
     */
-
+    public Packet() {
+	
+    }
 
     // use to send messages to the server
     public Packet(int flag, String username, String data) {

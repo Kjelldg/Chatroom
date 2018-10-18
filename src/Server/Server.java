@@ -25,7 +25,7 @@ public class Server {
             // initialize the database
         	database = new Database("jdbc:postgresql://localhost:5432/postgres",
                     "postgres",
-                    "[3`Td?9=");
+                    "marcus");//[3`Td?9=
             database.setUp();
 
             serverSocket = new ServerSocket(port);

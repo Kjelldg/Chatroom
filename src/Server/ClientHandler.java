@@ -93,8 +93,8 @@ class ClientHandler extends Thread {
 			// TODO: logic to save user to db goes here
 			login(initialPacket);
 			// used later to set userName to packet obj
-			//String welcomeMess = "Welcome" + username + " to stop chat enter '/close' as message";
-			//out.writeObject(new Packet(Packet.TEXT, username, welcomeMess));
+			String welcomeMess = "Welcome " + username + " to stop chat enter '/close' as message";
+			out.writeObject(new Packet(Packet.TEXT, "", welcomeMess));
 
 		} catch (IOException e) {
 			System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
@@ -111,10 +111,15 @@ class ClientHandler extends Thread {
 				if (userMessage.getFlag() == Packet.TEXT) {
 					// store message
 					Server.messageQueue.push(userMessage);
+					//get last message in queue here?
+					//out.writeObject(Server.messageQueue.pop());
 
 				} else {
 					System.err.println("Wrong packet flag sent from client.");
 				}
+				
+				//for testing purposes
+				out.writeObject(new Packet(Packet.TEXT, "Client thread", "HEJ"));
 				
 				// Parse new message string from user
 				// String userMessage = (String) in.readObject();
