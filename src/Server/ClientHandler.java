@@ -11,7 +11,6 @@ class ClientHandler extends Thread {
 	private Socket socket;
 	private ObjectInputStream in;
 	public ObjectOutputStream out;
-	private String username;
 	private boolean loggedIn = false;
 
 	// In charge of creating a thread for the client and handling packets from the
@@ -55,7 +54,6 @@ class ClientHandler extends Thread {
 			loggedIn = Server.database.logOnUser(username, password);
 			
 			if(loggedIn) {
-				this.username = username;
 				try {
 					out.writeObject(new Packet(Packet.TEXT, "Server", "Logged in"));
 				} catch (IOException e) {
@@ -85,16 +83,10 @@ class ClientHandler extends Thread {
 	@Override
 	public void run() {
 
-		// This code should run only once, registers user to db(?) and sends welcome
-		// confirmation back to the client
 		try {
 
 			Packet initialPacket = (Packet) in.readObject();
-			// TODO: logic to save user to db goes here
 			login(initialPacket);
-			// used later to set userName to packet obj
-			//String welcomeMess = "Welcome" + username + " to stop chat enter '/close' as message";
-			//out.writeObject(new Packet(Packet.TEXT, username, welcomeMess));
 
 		} catch (IOException e) {
 			System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
@@ -102,9 +94,8 @@ class ClientHandler extends Thread {
 			System.err.println(String.format("Wrong object received from %s", socket.getRemoteSocketAddress()));
 		}
 
-		while (socket.isConnected() && loggedIn) {
+		while (socket.isConnected()) {
 			try {
-
 				// get new chat message from user
 				Packet userMessage = (Packet) in.readObject();
 
@@ -115,13 +106,6 @@ class ClientHandler extends Thread {
 				} else {
 					System.err.println("Wrong packet flag sent from client.");
 				}
-				
-				// Parse new message string from user
-				// String userMessage = (String) in.readObject();
-				// Packet message = new Packet(Packet.TEXT, userName, userMessage);
-
-				// Packet message = (Packet) in.readObject();
-				// messages.add(message);
 
 			} catch (IOException e) {
 				System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
