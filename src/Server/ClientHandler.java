@@ -10,6 +10,7 @@ import java.net.Socket;
 class ClientHandler extends Thread {
 	private Socket socket;
 	private ObjectInputStream in;
+	private String username;
 	public ObjectOutputStream out;
 	private boolean loggedIn = false;
 
@@ -54,6 +55,7 @@ class ClientHandler extends Thread {
 			loggedIn = Server.database.logOnUser(username, password);
 			
 			if(loggedIn) {
+				this.username = username;
 				try {
 					out.writeObject(new Packet(Packet.TEXT, "Server", "Logged in"));
 				} catch (IOException e) {
@@ -88,6 +90,10 @@ class ClientHandler extends Thread {
 			Packet initialPacket = (Packet) in.readObject();
 			login(initialPacket);
 
+			// used later to set userName to packet obj
+			String welcomeMess = "Welcome " + username + " to stop chat enter '/close' as message";
+			out.writeObject(new Packet(Packet.TEXT, "", welcomeMess));
+
 		} catch (IOException e) {
 			System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
 		} catch (ClassNotFoundException e) {
@@ -106,6 +112,10 @@ class ClientHandler extends Thread {
 				} else {
 					System.err.println("Wrong packet flag sent from client.");
 				}
+				
+				//for testing purposes
+				//out.writeObject(new Packet(Packet.TEXT, "Client thread", "HEJ"));
+
 
 			} catch (IOException e) {
 				System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));

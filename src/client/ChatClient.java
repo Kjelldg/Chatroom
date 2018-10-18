@@ -15,15 +15,16 @@ import xml_history.*;
 
 public class ChatClient {
 
-	private static Socket socket;
-	private static String userName;
+	protected static Socket socket;
+	protected static String userName;
 	private static String password;
 	private static Scanner userInput;
+	//protected static boolean connectionClosed = false;
 
 	// private static PrintWriter out;
 	// private static BufferedReader in;
-	private static ObjectOutputStream out;
-	private static ObjectInputStream in;
+	protected static ObjectOutputStream out;
+	protected static ObjectInputStream in;
 
 	/*
 	 * Commented out so that server can run from main()
@@ -41,10 +42,8 @@ public class ChatClient {
 				System.out.println("connected to: " + socket.getInetAddress());
 
 				try {
-					// out = new PrintWriter(socket.getOutputStream());
 					out = new ObjectOutputStream(socket.getOutputStream());
 					in = new ObjectInputStream(socket.getInputStream());
-					// in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -60,47 +59,29 @@ public class ChatClient {
 					e.printStackTrace();
 				}
 
-				boolean connectionClosed = false;
+
+				InputThread inputFromUser = new InputThread(userInput);
+				RetriveMessageThread servermessages = new RetriveMessageThread();
+				//retrive welcome message
+				servermessages.run();
 				// loop until user is typing /close
-				while (!connectionClosed) {
-
-					System.out.println("Enter new message");
-					// read user input
-					String message = userInput.nextLine();
-					// break loop if user prompts command.
-					if (message.equalsIgnoreCase("/close")) {
-						connectionClosed = true;
+				while (true) {
+					
+					//called this way since the client handler first listens for input, then sends messages.
+					inputFromUser.run();
+					if(!inputFromUser.shouldRun)
 						break;
-					}
-					// send message
-					Packet pack = new Packet(Packet.TEXT, userName, message);
-					try {
-						out.writeObject(pack);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-
-					// retrieve new message
-					Packet serverMessage = new Packet(Packet.TEXT, "", "");
-					try {
-						serverMessage = (Packet) in.readObject();
-					} catch (IOException | ClassNotFoundException e) {
-
-						e.printStackTrace();
-					}
-					if (serverMessage != null && serverMessage.getFlag() == Packet.TEXT) {
-
-						System.out.println(serverMessage.getUsername() + ": " + serverMessage.getData() + "\n");
-						// TODO: save to file logic goes here..
-					}
+					servermessages.run();
+						
 				}
-
+				
 				closeConnection();
 			}
+			else {
+				System.out.println("Goodbye");
+			}
 
-		} else {
-			System.out.println("Goodbye");
-		}
+		} 
 
 	}
 
