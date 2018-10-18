@@ -51,7 +51,6 @@ public class Server {
 
     public void listen() {
         try {
-
             // Listens for connections
             ClientHandler client = new ClientHandler(serverSocket.accept());
 
@@ -68,9 +67,10 @@ public class Server {
 
    public static void main(String args[])  {
         Server server = new Server(1337);
-        
-        server.listen();
-        
+
+        while(true) {
+            server.listen();
+        }
         
 
     }
