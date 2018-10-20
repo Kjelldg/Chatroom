@@ -22,20 +22,19 @@ public class ServerThread extends Thread {
     public void run() {
 
         while (true) {
-            if (!Server.clients.isEmpty()) {
-                try {
-                    Packet currentPacket = Server.messageQueue.pop();
+            try {
+                Packet currentPacket = Server.messageQueue.pop();
 
-                    for (ClientHandler client : Server.clients) {
-                        send(client, currentPacket);
-                    }
+                for (ClientHandler client : Server.clients) {
+                    send(client, currentPacket);
+                }
 
                 } catch (Exception e) {
-                    System.err.println("No more messages to send.");
+                    System.err.println("Queue is empty.");
                 }
             }
         }
     }
 
 
-}
+
