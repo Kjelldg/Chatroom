@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
 class ClientHandler extends Thread {
 	private Socket socket;
@@ -92,30 +93,33 @@ class ClientHandler extends Thread {
 
 			// used later to set userName to packet obj
 			String welcomeMess = "Welcome " + username + " to stop chat enter '/close' as message";
-			out.writeObject(new Packet(Packet.TEXT, "", welcomeMess));
+			out.writeObject(new Packet(Packet.TEXT, "SERVER", welcomeMess));
 
 		} catch (IOException e) {
 			System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
 		} catch (ClassNotFoundException e) {
 			System.err.println(String.format("Wrong object received from %s", socket.getRemoteSocketAddress()));
 		}
-
+		
+		ServerThread messageThread = new ServerThread();
+		messageThread.start();
 		while (socket.isConnected()) {
 			try {
 				// get new chat message from user
 				Packet userMessage = (Packet) in.readObject();
+				
+				if(userMessage == null)
+					return;
 
 				if (userMessage.getFlag() == Packet.TEXT) {
 					// store message
 					Server.messageQueue.push(userMessage);
+					//send message to all clients
+					messageThread.send(userMessage);
 
 				} else {
 					System.err.println("Wrong packet flag sent from client.");
 				}
-				
-				//for testing purposes
-				//out.writeObject(new Packet(Packet.TEXT, "Client thread", "HEJ"));
-
 
 			} catch (IOException e) {
 				System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));

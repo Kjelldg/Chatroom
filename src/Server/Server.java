@@ -2,8 +2,6 @@ package Server;
 import Database.Database;
 import Resources.MessageQueue;
 import Resources.Packet;
-import com.sun.jmx.remote.internal.ArrayQueue;
-import sun.misc.resources.Messages;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,7 +10,7 @@ import java.util.ArrayList;
 
 public class Server {
     private ServerSocket serverSocket;
-    public static ArrayList<ClientHandler> clients = new ArrayList<>();
+    public static volatile ArrayList<ClientHandler> clients = new ArrayList<>();
     public static Database database;
 
     public static MessageQueue messageQueue = new MessageQueue();
@@ -32,8 +30,8 @@ public class Server {
             System.out.println(String.format("Listening on port %s...", port));
 
             // starts a thread to send out packages to logged in clients.
-            ServerThread messageHandler = new ServerThread();
-            messageHandler.start();
+            //ServerThread messageHandler = new ServerThread();
+            //messageHandler.start();
 
         } catch(IOException e) {
             System.err.println(String.format("Port %s is already open.", port));

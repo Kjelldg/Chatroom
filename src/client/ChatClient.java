@@ -19,16 +19,9 @@ public class ChatClient {
 	protected static String userName;
 	private static String password;
 	private static Scanner userInput;
-	//protected static boolean connectionClosed = false;
 
-	// private static PrintWriter out;
-	// private static BufferedReader in;
 	protected static ObjectOutputStream out;
 	protected static ObjectInputStream in;
-
-	/*
-	 * Commented out so that server can run from main()
-	 */
 
 	public static void main(String[] args) {
 		System.out.println("Welcome to chat.\n Would you like to connect now? (yes/no)");
@@ -60,18 +53,18 @@ public class ChatClient {
 				}
 
 
-				InputThread inputFromUser = new InputThread(userInput);
-				RetriveMessageThread servermessages = new RetriveMessageThread();
-				//retrive welcome message
-				servermessages.run();
+				
+				Thread input = new Thread(new InputThread(userInput));
+				Thread getServerResponse = new Thread(new RetriveMessageThread());
+
+				input.start();
+				getServerResponse.start();
+
 				// loop until user is typing /close
 				while (true) {
-					
-					//called this way since the client handler first listens for input, then sends messages.
-					inputFromUser.run();
-					if(!inputFromUser.shouldRun)
+
+					if(!input.isAlive())
 						break;
-					servermessages.run();
 						
 				}
 				

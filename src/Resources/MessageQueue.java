@@ -1,9 +1,10 @@
 package Resources;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
+import java.util.HashMap;
 
 public class MessageQueue {
-    ArrayList<Packet> mq = new ArrayList<>();
+    volatile ArrayList<Packet> mq = new ArrayList<>();
 
 
     // push packet to array
@@ -22,6 +23,10 @@ public class MessageQueue {
         } else {
             throw new EmptyStackException();
         }
+    }
+    
+    public Packet getPacketAtPosition(int pos) {
+    	return mq.get(pos);
     }
 
     public int size() {
