@@ -21,8 +21,6 @@ public class RetriveMessageThread implements Runnable {
 					
 						System.out.println("\n" + serverMessage.getUsername().concat(": ") + serverMessage.getData() + "\n");
 				}
-			
-		
 	}
 
 }
