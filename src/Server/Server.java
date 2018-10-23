@@ -29,10 +29,6 @@ public class Server {
             serverSocket = new ServerSocket(port);
             System.out.println(String.format("Listening on port %s...", port));
 
-            // starts a thread to send out packages to logged in clients.
-            //ServerThread messageHandler = new ServerThread();
-            //messageHandler.start();
-
         } catch(IOException e) {
             System.err.println(String.format("Port %s is already open.", port));
         } catch (SQLException e) {

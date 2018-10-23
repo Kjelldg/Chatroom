@@ -1,12 +1,12 @@
 package Server;
 
 import Resources.Packet;
+import xml_history.Write_XML;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
 
 class ClientHandler extends Thread {
 	private Socket socket;
@@ -101,8 +101,7 @@ class ClientHandler extends Thread {
 			System.err.println(String.format("Wrong object received from %s", socket.getRemoteSocketAddress()));
 		}
 		
-		ServerThread messageThread = new ServerThread();
-		messageThread.start();
+		MessageUtil msgUtil = new MessageUtil();
 		while (socket.isConnected()) {
 			try {
 				// get new chat message from user
@@ -115,7 +114,8 @@ class ClientHandler extends Thread {
 					// store message
 					Server.messageQueue.push(userMessage);
 					//send message to all clients
-					messageThread.send(userMessage);
+					msgUtil.send(userMessage);
+					// Stores message in separate XML-file.					
 
 				} else {
 					System.err.println("Wrong packet flag sent from client.");

@@ -24,7 +24,7 @@ public class ChatClient {
 	protected static ObjectInputStream in;
 
 	public static void main(String[] args) {
-		System.out.println("Welcome to chat.\n Would you like to connect now? (yes/no)");
+		System.out.println("Welcome to chat! \n Would you like to connect now? (yes/no)");
 		userInput = new Scanner(System.in);
 		String response = userInput.nextLine();
 

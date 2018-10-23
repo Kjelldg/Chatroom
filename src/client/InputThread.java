@@ -47,7 +47,7 @@ public class InputThread implements Runnable{
 		}
 		
 		}
-	
+	//prevents a new message line to appear before inital welcome message from the server
 	private void delayStart() {
 		
 		try {
