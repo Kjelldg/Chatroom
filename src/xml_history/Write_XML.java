@@ -1,22 +1,14 @@
 package xml_history;
 
 import java.io.File;
-import java.util.Scanner;
 
 public class Write_XML {
 
-	public static void main(String[] args) {
-
-		Scanner scanner = new Scanner(System.in);
-
-		System.out.println("Enter username: ");
-		String userName = scanner.nextLine();
-
-		System.out.println("Enter message: ");
-		String user_Input_Message = scanner.nextLine();
+	public void write_Message(String user_Input_Message, String userName) {
 
 		File xmlFile = new File("./UserMessage.xml");
 		boolean xmlFileBooleanExists = xmlFile.exists();
+		// String user_Input_Message_String = user_Input_Message.toString();
 
 		/*
 		 * Check if the file exists or not. If it exists, append the new message. If it
