@@ -116,7 +116,7 @@ class ClientHandler extends Thread {
 					// send message to all clients
 					msgUtil.send(userMessage);
 					// Stores message in separate XML-file.
-					write_XML.write_Message(userMessage.toString(), username);
+					write_XML.write_Message(userMessage.getData(), username);
 
 				} else {
 					System.err.println("Wrong packet flag sent from client.");
