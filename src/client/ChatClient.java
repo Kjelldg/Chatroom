@@ -1,17 +1,13 @@
 package client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
 import Resources.Packet;
-import xml_history.*;
 
 public class ChatClient {
 
@@ -19,19 +15,12 @@ public class ChatClient {
 	protected static String userName;
 	private static String password;
 	private static Scanner userInput;
-	//protected static boolean connectionClosed = false;
 
-	// private static PrintWriter out;
-	// private static BufferedReader in;
 	protected static ObjectOutputStream out;
 	protected static ObjectInputStream in;
 
-	/*
-	 * Commented out so that server can run from main()
-	 */
-
 	public static void main(String[] args) {
-		System.out.println("Welcome to chat.\n Would you like to connect now? (yes/no)");
+		System.out.println("Welcome to chat! \n Would you like to connect now? (yes/no)");
 		userInput = new Scanner(System.in);
 		String response = userInput.nextLine();
 
@@ -49,9 +38,9 @@ public class ChatClient {
 				}
 
 				try {
-					// send username and password to server
+					// send user name and password to server
 					out.writeObject(new Packet(Packet.PASSWORD, userName, password));
-					// return message from server prompting username: like: welcome userName write
+					// return message from server prompting user name: like: welcome userName write
 					// "/close" to close connection
 					Packet greet = (Packet) in.readObject();
 					System.out.println(greet.getData());
@@ -60,18 +49,18 @@ public class ChatClient {
 				}
 
 
-				InputThread inputFromUser = new InputThread(userInput);
-				RetriveMessageThread servermessages = new RetriveMessageThread();
-				//retrive welcome message
-				servermessages.run();
+				
+				Thread input = new Thread(new InputThread(userInput));
+				Thread getServerResponse = new Thread(new RetriveMessageThread());
+
+				input.start();
+				getServerResponse.start();
+
 				// loop until user is typing /close
 				while (true) {
-					
-					//called this way since the client handler first listens for input, then sends messages.
-					inputFromUser.run();
-					if(!inputFromUser.shouldRun)
+
+					if(!input.isAlive())
 						break;
-					servermessages.run();
 						
 				}
 				

@@ -3,6 +3,7 @@ package Server;
 import Resources.Packet;
 import xml_history.*;
 
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -91,9 +92,9 @@ class ClientHandler extends Thread {
 			Packet initialPacket = (Packet) in.readObject();
 			login(initialPacket);
 
-			// used later to set userName to packet obj
+			// used later to set userName to packet object
 			String welcomeMess = "Welcome " + username + " to stop chat enter '/close' as message";
-			out.writeObject(new Packet(Packet.TEXT, "", welcomeMess));
+			out.writeObject(new Packet(Packet.TEXT, "SERVER", welcomeMess));
 
 		} catch (IOException e) {
 			System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));
@@ -101,16 +102,23 @@ class ClientHandler extends Thread {
 			System.err.println(String.format("Wrong object received from %s", socket.getRemoteSocketAddress()));
 		}
 
+		MessageUtil msgUtil = new MessageUtil();
 		while (socket.isConnected()) {
 			try {
 				// get new chat message from user
 				Packet userMessage = (Packet) in.readObject();
 
+				if (userMessage == null)
+					return;
+
 				if (userMessage.getFlag() == Packet.TEXT) {
 					// store message
 					Server.messageQueue.push(userMessage);
+					// send message to all clients
+					msgUtil.send(userMessage);
 					// Stores message in separate XML-file.
-					write_XML.write_Message(userMessage.toString(), username);
+					write_XML.write_Message(userMessage.getData(), username);
+
 
 				} else {
 					System.err.println("Wrong packet flag sent from client.");
@@ -118,6 +126,7 @@ class ClientHandler extends Thread {
 
 				// for testing purposes
 				// out.writeObject(new Packet(Packet.TEXT, "Client thread", "HEJ"));
+
 
 			} catch (IOException e) {
 				System.err.println(String.format("Could not receive message from %s", socket.getRemoteSocketAddress()));

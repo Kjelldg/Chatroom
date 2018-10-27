@@ -2,8 +2,6 @@ package xml_history;
 
 import java.io.File;
 
-import com.sun.xml.internal.ws.api.message.Packet;
-
 public class Write_XML {
 
 	public void write_Message(String user_Input_Message, String userName) {

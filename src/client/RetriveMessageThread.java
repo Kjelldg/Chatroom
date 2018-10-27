@@ -9,22 +9,18 @@ public class RetriveMessageThread implements Runnable {
 	@Override
 	public void run() {
 		
-	
-		 	
-			try{
-					Packet serverMessage = (Packet) ChatClient.in.readObject();
-					
-					if (serverMessage != null && serverMessage.getFlag() == Packet.TEXT) {
-	
-						System.out.println(serverMessage.getUsername() + ": " + serverMessage.getData() + "\n");
-						// TODO: save to file logic goes here..
-					}
-				
-			} catch (IOException | ClassNotFoundException e) {
-
-				e.printStackTrace();
-			}
+			while(true) {
 		
+					Packet serverMessage = null;
+					try {
+						serverMessage = (Packet) ChatClient.in.readObject();
+
+					} catch (ClassNotFoundException | IOException e) {
+						e.printStackTrace();
+					}
+					
+						System.out.println("\n" + serverMessage.getUsername().concat(": ") + serverMessage.getData() + "\n");
+				}
 	}
 
 }
